@@ -4,17 +4,21 @@
 \alias{download}
 \title{Download datasets via the Data Retriever.}
 \usage{
-download(dataset, path = ".", sub_dir = FALSE, log_dir = NULL)
+download(dataset, path = "./", quiet = FALSE, sub_dir = "",
+  debug = FALSE, use_cache = TRUE)
 }
 \arguments{
 \item{dataset}{the name of the dataset that you wish to download}
 
 \item{path}{the path where the data should be downloaded to}
 
-\item{sub_dir}{if true and the downloaded dataset is stored in subdirectories those subdirectories will be preserved and placed according the path argument, defaults to false.}
+\item{quiet}{logical, if true retriever runs in quiet mode}
 
-\item{log_dir}{the location where the retriever log should be stored if
-the progress is not printed to the console}
+\item{sub_dir}{downloaded dataset is stored into a custom subdirectory.}
+
+\item{debug}{Setting TRUE helps in debugging in case of errors}
+
+\item{use_cache}{Setting FALSE reinstalls scripts even if they are already installed}
 }
 \description{
 Directly downloads data files with no processing, allowing downloading of
@@ -22,9 +26,9 @@ non-tabular data.
 }
 \examples{
 \donttest{
-rdataretriever::download('portal')
-## list files downloaded
-dir('.', pattern='portal')
+rdataretriever::download('plant-comp-ok')
+# downloaded files will be copied to your working directory
+# when no path is specified
+dir()
 }
 }
-

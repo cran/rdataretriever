@@ -2,7 +2,7 @@
 % Please edit documentation in R/rdataretriever.R
 \name{install}
 \alias{install}
-\title{Install datasets via the Data Retriever.}
+\title{Install datasets via the Data Retriever (deprecated).}
 \usage{
 install(dataset, connection, db_file = NULL, conn_file = NULL,
   data_dir = ".", log_dir = NULL)
@@ -10,14 +10,14 @@ install(dataset, connection, db_file = NULL, conn_file = NULL,
 \arguments{
 \item{dataset}{the name of the dataset that you wish to download}
 
-\item{connection}{what type of database connection should be used. 
+\item{connection}{what type of database connection should be used.
 The options include: mysql, postgres, sqlite, msaccess, or csv'}
 
-\item{db_file}{the name of the datbase file the dataset should be loaded 
+\item{db_file}{the name of the datbase file the dataset should be loaded
 into}
 
 \item{conn_file}{the path to the .conn file that contains the connection
-configuration options for mysql and postgres databases. This defaults to 
+configuration options for mysql and postgres databases. This defaults to
 mysql.conn or postgres.conn respectively. The connection file is a file that
 is formated in the following way:
 \tabular{ll}{
@@ -42,4 +42,3 @@ systems: MySQL, PostgreSQL, SQLite, or Microsoft Access.
 rdataretriever::install('iris', 'csv')
 }
 }
-
