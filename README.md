@@ -1,91 +1,131 @@
 # rdataretriever
 
-[![Build Status](https://travis-ci.org/ropensci/rdataretriever.png)](https://travis-ci.org/ropensci/rdataretriever)
-[![cran version](https://www.r-pkg.org/badges/version/rdataretriever)](https://CRAN.R-project.org/package=rdataretriever)
+<!-- badges: start -->
+[![Build Status](https://travis-ci.org/ropensci/rdataretriever.svg?branch=master)](https://travis-ci.org/ropensci/rdataretriever)
+[![Build status](https://ci.appveyor.com/api/projects/status/de1badmnrt6goamh?svg=true)](https://ci.appveyor.com/project/ethanwhite/rdataretriever)[![cran version](https://www.r-pkg.org/badges/version/rdataretriever)](https://CRAN.R-project.org/package=rdataretriever)
 [![Documentation Status](https://readthedocs.org/projects/retriever/badge/?version=latest)](https://retriever.readthedocs.io/en/latest/rdataretriever.html#)
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/rdataretriever)](https://CRAN.R-project.org/package=rdataretriever) +
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/ecoretriever)](https://CRAN.R-project.org/package=ecoretriever)
 (old package name)
+<!-- badges: end -->
 
-R interface to the [Data Retriever](http://data-retriever.org).
+R interface to the [Data Retriever](https://retriever.readthedocs.io/en/latest/).
 
 The Data Retriever automates the tasks of finding, downloading, and cleaning up
-publicly available data, and then stores them in a local database or csv
-files. This lets data analysts spend less time cleaning up and managing data,
-and more time analyzing it.
+publicly available data, and loads them or stores them in variety of databases
+or flat file formats. This lets data analysts spend less time cleaning up and
+managing data, and more time analyzing it.
 
-This package lets you access the Retriever using R, so that the Retriever's data
-handling can easily be integrated into R workflows.
+This package lets you work with the Data Retriever (written in Python) using R,
+so that the Retriever's data handling can easily be integrated into R workflows.
 
 ## Table of Contents
 
   - [Installation](#installation)
-      - [Installation from CRAN and PyPi](#installation-from-cran-and-pypi)
-      - [Installation with devtools and <code>reticulate</code>](#installation-with-devtools-and-reticulate)
-  - [Examples](#examples)
-  - [Spatial data installation](#spatial-data-installation)
-  - [Using Dockers](#using-dockers)
+      - [Basic Installation (no Python experience needed)](#basic-installation)
+      - [Advanced Installation for Python Users](#advanced-installation-for-python-users)
+  - [Installing Tabular Datasets](#installing-tabular-datasets)
+  - [Installing Spatial Datasets](#installing-spatial-datasets)
+  - [Using Docker Containers](#using-docker-containers)
+  - [Provenance](#provenance)
   - [Acknowledgements](#acknowledgements)
 
 ## Installation
 
-`rdataretriever` is an R wrapper for the Python based Data Retriever. This means
-that Python and the `retriever` package need to be installed first.
+The `rdataretriever` is an R wrapper for the Python package, [Data Retriever](https://retriever.readthedocs.io/en/latest/). This means
+that *Python* and the `retriever` Python package need to be installed first.
 
-#### Installation from `CRAN` and `conda` or `Anaconda`
+### Basic Installation
 
-*Use this if you are new to Python or don't have a local Python installation*
+If you just want to use the Data Retriever from within R follow these
+instuctions run the following commands in R. This will create a local Python
+installation that will only be used by R and install the needed Python package
+for you.
 
-1. Install the Python 3.7 version of the miniconda Python distribution from https://docs.conda.io/en/latest/miniconda.html
-2. In R install the `reticulate` package:
+```coffee
+install.packages('reticulate') # Install R package for interacting with Python
+reticulate::install_miniconda() # Install Python
+reticulate::py_install('retriever') # Install the Python retriever package
+install.packages('rdataretriever') # Install the R package for running the retriever
+rdataretriever::get_updates() # Update the available datasets
+```
 
-  ```coffee
-  install.packages("reticulate")
+**After running these commands restart R.**
+
+### Advanced Installation for Python Users
+
+If you are using Python for other tasks you can use `rdataretriever` with your
+existing Python installation (though the [basic installation](#basic-installation)
+above will also work in this case by creating a separate miniconda install and
+Python environment).
+
+#### Install the `retriever` Python package
+
+Install the `retriever` Python package into your prefered Python environment
+using either `conda` (64-bit conda is required):
+
+  ```bash
+  conda install -c conda-forge retriever
   ```
 
-3. In R run the following to install the `retriever` Python package:
+  or `pip`:
 
-  ```coffee
-  library(reticulate)
-  py_available(initialize = TRUE)
-  py_install("retriever")
+  ```bash
+  pip install retriever
   ```
 
-4. Install the `rdataretriever` R package:
+#### Select the Python environment to use in R
 
-  ```coffee
-  install.packages("rdataretriever") # from CRAN
-  devtools::install_github("ropensci/rdataretriever") # from GitHub
-  ```
+`rdataretriever` will try to find Python environments with `retriever` (see the
+`reticulate` documentation on
+[order of discovery](https://rstudio.github.io/reticulate/articles/versions.html#order-of-discovery-1)
+for more details) installed. Alternatively you can select a Python environment
+to use when working with `rdataretriever` (and other packages using
+`reticulate`).
 
-#### Installation with `devtools`
+The most robust way to do this is to set the `RETICULATE_PYTHON` environment
+variable to point to the preferred Python executable:
 
-*Use this if you are already familiar with Python and have a local Python installation*
+```coffee
+Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
+```
 
-1. Check that your local Python installation is Python 3.6 and above
-2. In R install the `reticulate` package:
+This command can be run interactively or placed in `.Renviron` in your home
+directory.
 
-  ```coffee
-  install.packages("reticulate")
-  ```
+Alternatively you can do select the Python environment through the `reticulate`
+package for either `conda`:
 
-3. In R run the following (`replacing "/path/to/python" with the path to you Python executeable`) to install the `retriever` Python package:
+```coffee
+library(reticulate)
+use_conda('name_of_conda_environment')
+```
 
-  ```coffee
-  library(reticulate)
-  use_python("/path/to/python")
-  py_install("retriever")
-  ```
+or `virtualenv`:
 
-4. Install the `rdataretriever` R package:
+```coffee
+library(reticulate)
+use_virtualenv("path_to_virtualenv_environment")
+```
 
-  ```coffee
-  devtools::install_github("ropensci/rdataretriever") # from GitHub
-  install.packages("rdataretriever") # from CRAN
-  ```
+You can check to see which Python environment is being used with:
 
-Examples
---------
+```coffee
+py_config()
+```
+
+#### Install the `rdataretriever` R package
+
+```coffee
+install.packages("rdataretriever") # latest release from CRAN
+```
+
+```coffee
+devtools::install_github("ropensci/rdataretriever") # development version from GitHub
+```
+
+## Installing Tabular Datasets
+
 ```coffee
 library(rdataretriever)
 
@@ -106,8 +146,7 @@ head(portal$species)
 
 ```
 
-Spatial data Installation
--------------------------
+## Installing Spatial Datasets
 
 **Set-up and Requirements**
 
@@ -170,8 +209,35 @@ rdataretriever::install_postgres('usgs-elevation', list(-94.98704597353938, 39.0
 ```
 
 
-Using Dockers
--------------
+## Provenance
+
+`rdataretriever` allows users to save a dataset in its current state which can be used later.
+
+Note: You can save your datasets in provenance directory by setting the environment variable `PROVENANCE_DIR`
+
+**Commit a dataset**
+```coffee
+rdataretriever::commit('abalone-age', commit_message='Sample commit', path='/home/user/')
+```
+To commit directly to provenance directory:
+```coffee
+rdataretriever::commit('abalone-age', commit_message='Sample commit')
+```
+**Log of committed dataset in provenance directory**
+```coffee
+rdataretriever::commit_log('abalone-age')
+```
+
+**Install a committed dataset**
+```coffee
+rdataretriever::install_sqlite('abalone-age-a76e77.zip') 
+```
+Datasets stored in provenance directory can be installed directly using hash value
+```coffee
+rdataretriever::install_sqlite('abalone-age', hash_value='a76e77`)
+``` 
+
+## Using Docker Containers
 
 To run the image interactively
 
@@ -217,8 +283,8 @@ A big thanks to Ben Morris for helping to develop the Data Retriever.
 Thanks to the rOpenSci team with special thanks to Gavin Simpson,
 Scott Chamberlain, and Karthik Ram who gave helpful advice and fostered
 the development of this R package.
-Development of this software was funded by the [National Science Foundation](http://nsf.gov/)
-as part of a [CAREER award to Ethan White](http://nsf.gov/awardsearch/showAward.do?AwardNumber=0953694).
+Development of this software was funded by the [National Science Foundation](https://nsf.gov/)
+as part of a [CAREER award to Ethan White](https://nsf.gov/awardsearch/showAward.do?AwardNumber=0953694).
 
 ---
-[![ropensci footer](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+[![ropensci footer](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)

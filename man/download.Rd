@@ -4,8 +4,14 @@
 \alias{download}
 \title{Download datasets via the Data Retriever.}
 \usage{
-download(dataset, path = "./", quiet = FALSE, sub_dir = "",
-  debug = FALSE, use_cache = TRUE)
+download(
+  dataset,
+  path = "./",
+  quiet = FALSE,
+  sub_dir = "",
+  debug = FALSE,
+  use_cache = TRUE
+)
 }
 \arguments{
 \item{dataset}{the name of the dataset that you wish to download}
@@ -26,7 +32,7 @@ non-tabular data.
 }
 \examples{
 \donttest{
-rdataretriever::download('plant-comp-ok')
+rdataretriever::download("plant-comp-ok")
 # downloaded files will be copied to your working directory
 # when no path is specified
 dir()
