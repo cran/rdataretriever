@@ -2,8 +2,9 @@
 #'
 #' @param repo path to the repository
 #'
+#' @return No return value, checks for updates \code{repo}
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::check_for_updates()
 #' }
 #' @importFrom reticulate import r_to_py
@@ -17,7 +18,6 @@ check_for_updates <- function(repo = "") {
   }
 }
 
-
 #' Commit a dataset
 #'
 #' @param dataset name of the dataset
@@ -25,8 +25,9 @@ check_for_updates <- function(repo = "") {
 #' @param path path to save the committed dataset, if no path given save in provenance directory
 #' @param quiet logical, if true retriever runs in quiet mode
 #'
+#' @return No return value, provides confirmation for commit
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::commit("iris")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -36,13 +37,13 @@ commit <- function(dataset, commit_message = "", path = NULL, quiet = FALSE) {
   cat("Successfully committed.")
 }
 
-
 #' See the log of committed dataset stored in provenance directory
 #'
 #' @param dataset name of the dataset stored in provenance directory
 #'
+#' @return No return value, prints message after commit
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::commit_log("iris")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -56,14 +57,13 @@ commit_log <- function(dataset) {
   message(paste0("Date: ", res$date))
 }
 
-
 #' Name all available dataset scripts.
 #'
 #' Additional information on the available datasets can be found at url https://retriever.readthedocs.io/en/latest/datasets.html
 #'
 #' @return returns a character vector with the available datasets for download
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::dataset_names()
 #' }
 #' @importFrom reticulate import r_to_py
@@ -85,20 +85,31 @@ dataset_names <- function() {
   return(datasets_list)
 }
 
+#' Get retriever citation
+#'
+#' @return No return value, outputs citation of the Data Retriever Python package
+#' @examples
+#' \dontrun{
+#' rdataretriever::get_retriever_citation()
+#' }
+#' @export
+get_retriever_citation <- function() {
+  retriever$get_retriever_citation()
+}
 
-#' Get citation
+#' Get citation of a script
 #'
 #' @param dataset dataset to obtain citation
 #'
+#' @return No return value, gets citation of a script
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::get_script_citation(dataset = "")
 #' }
 #' @export
-get_script_citation <- function(dataset = "") {
+get_script_citation <- function(dataset = NULL) {
   retriever$get_script_citation(dataset)
 }
-
 
 #' Get dataset names from upstream
 #'
@@ -106,8 +117,9 @@ get_script_citation <- function(dataset = "") {
 #' @param licenses filter datasets based on license
 #' @param repo path to the repository
 #'
+#' @return No return value, gets dataset names from upstream
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::get_dataset_names_upstream(keywords = "", licenses = "", repo = "")
 #' }
 #' @export
@@ -119,16 +131,14 @@ get_dataset_names_upstream <- function(keywords = "", licenses = "", repo = "") 
   }
 }
 
-
-#' Get script upstream
+#' Get scripts upstream
 #'
 #' @param dataset name of the dataset
 #' @param repo path to the repository
 #'
-#' @export
-#'
+#' @return No return value, gets upstream scripts
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::get_script_upstream("iris")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -143,9 +153,10 @@ get_script_upstream <- function(dataset, repo = "") {
 
 #' Get Data Retriever version
 #' @param clean boolean return cleaned version appropriate for semver
+#'
 #' @return returns a string with the version information
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::data_retriever_version()
 #' }
 #' @importFrom reticulate import r_to_py
@@ -163,7 +174,7 @@ data_retriever_version <- function(clean = TRUE) {
 #' Check to see if minimum version of retriever Python package is installed
 #' @return boolean
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::check_retriever_availability()
 #' }
 #' @importFrom reticulate import r_to_py
@@ -189,6 +200,8 @@ check_retriever_availability <- function() {
     } else {
       return(TRUE)
     }
+  } else if(nchar(Sys.getenv('IN_PKGDOWN')) || nchar(Sys.getenv('CI'))){
+    return(system("pip install git+https://git@github.com/weecology/retriever.git") == 0)
   } else {
     message("The retriever Python package needs to be installed.\nSee: https://docs.ropensci.org/rdataretriever/#installation")
     return(FALSE)
@@ -205,8 +218,10 @@ check_retriever_availability <- function() {
 #' @param data_names the names you wish to assign to cells of the list which
 #' stores the fetched dataframes. This is only relevant if you are
 #' downloading more than one dataset.
+#'
+#' @return Returns a dataframe of \code{dataset}
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ## fetch the portal Database
 #' portal <- rdataretriever::fetch("portal")
 #' class(portal)
@@ -287,7 +302,6 @@ fetch <- function(dataset, quiet = TRUE, data_names = NULL) {
   return(datasets)
 }
 
-
 #' Download datasets via the Data Retriever.
 #'
 #' Directly downloads data files with no processing, allowing downloading of
@@ -297,10 +311,12 @@ fetch <- function(dataset, quiet = TRUE, data_names = NULL) {
 #' @param path the path where the data should be downloaded to
 #' @param quiet logical, if true retriever runs in quiet mode
 #' @param sub_dir downloaded dataset is stored into a custom subdirectory.
-#' @param debug Setting TRUE helps in debugging in case of errors
+#' @param debug setting TRUE helps in debugging in case of errors
 #' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
+#'
+#' @return No return value, downloads the raw dataset
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::download("plant-comp-ok")
 #' # downloaded files will be copied to your working directory
 #' # when no path is specified
@@ -317,10 +333,12 @@ download <- function(dataset, path = "./", quiet = FALSE, sub_dir = "", debug = 
 #' Additional information on the available datasets can be found at url https://retriever.readthedocs.io/en/latest/datasets.html
 #'
 #' @return returns a character vector with the available datasets for download
-#' @param keywords Search all datasets by keywords
-#' @param licenses Search all datasets by licenses
+#' @param keywords search all datasets by keywords
+#' @param licenses search all datasets by licenses
+#'
+#' @return Returns the names of all available dataset scripts
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::datasets()
 #' }
 #' @importFrom reticulate import r_to_py
@@ -349,12 +367,14 @@ datasets <- function(keywords = "", licenses = "") {
 #' @param dataset the name of the dataset that you wish to install or path to a committed dataset zip file
 #' @param table_name the name of the database file to store data
 #' @param data_dir the dir path to store data, defaults to working dir
-#' @param debug Setting TRUE helps in debugging in case of errors
+#' @param debug setting TRUE helps in debugging in case of errors
 #' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
-#' @param force Setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
+#' @param force setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
 #' @param hash_value the hash value of committed dataset when installing from provenance directory
+#'
+#' @return No return value, installs datasets into CSV
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install_csv("iris")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -370,12 +390,13 @@ install_csv <- function(dataset, table_name = "{db}_{table}.csv", data_dir = get
 #' @param dataset the name of the dataset that you wish to install or path to a committed dataset zip file
 #' @param table_name the name of the database file to store data
 #' @param data_dir the dir path to store data, defaults to working dir
-#' @param debug Setting TRUE helps in debugging in case of errors
-#' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
-#' @param force Setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
+#' @param debug setting TRUE helps in debugging in case of errors
+#' @param use_cache setting FALSE reinstalls scripts even if they are already installed
+#' @param force setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
 #' @param hash_value the hash value of committed dataset when installing from provenance directory
+#' @return No return value, installs datasets in to JSON
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install_json("iris")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -384,7 +405,6 @@ install_json <- function(dataset, table_name = "{db}_{table}.json", data_dir = g
   retriever$install_json(dataset, table_name, data_dir, debug, use_cache, force, hash_value)
 }
 
-
 #' Install datasets via the Data Retriever.
 #'
 #' Data is stored in XML files
@@ -392,12 +412,14 @@ install_json <- function(dataset, table_name = "{db}_{table}.json", data_dir = g
 #' @param dataset the name of the dataset that you wish to install or path to a committed dataset zip file
 #' @param table_name the name of the database file to store data
 #' @param data_dir the dir path to store data, defaults to working dir
-#' @param debug Setting TRUE helps in debugging in case of errors
+#' @param debug setting TRUE helps in debugging in case of errors
 #' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
-#' @param force Setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
+#' @param force setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
 #' @param hash_value the hash value of committed dataset when installing from provenance directory
+#'
+#' @return No return value, installs datasets into XML
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install_xml("iris")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -418,12 +440,14 @@ install_xml <- function(dataset, table_name = "{db}_{table}.xml", data_dir = get
 #' @param database_name database name in which dataset will be installed
 #' @param table_name table name specified especially for datasets
 #' containing one file
-#' @param debug Setting TRUE helps in debugging in case of errors
-#' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
-#' @param force Setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
+#' @param debug setting TRUE helps in debugging in case of errors
+#' @param use_cache setting FALSE reinstalls scripts even if they are already installed
+#' @param force setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
 #' @param hash_value the hash value of committed dataset when installing from provenance directory
+#'
+#' @return No return value, installs datasets into MySQL database
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install_mysql(dataset = "portal", user = "postgres", password = "abcdef")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -451,13 +475,15 @@ install_mysql <- function(dataset, user = "root", password = "", host = "localho
 #' @param database_name database schema name in which dataset will be installed
 #' @param table_name table name specified especially for datasets
 #' containing one file
-#' @param bbox Optional extent values used to fetch data from the spatial dataset
-#' @param debug Setting TRUE helps in debugging in case of errors
-#' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
-#' @param force Setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
+#' @param bbox optional extent values used to fetch data from the spatial dataset
+#' @param debug setting TRUE helps in debugging in case of errors
+#' @param use_cache setting FALSE reinstalls scripts even if they are already installed
+#' @param force setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
 #' @param hash_value the hash value of committed dataset when installing from provenance directory
+#'
+#' @return No return value, installs datasets into PostgreSQL database
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install_postgres(dataset = "portal", user = "postgres", password = "abcdef")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -483,12 +509,14 @@ install_postgres <- function(dataset, user = "postgres", password = "",
 #' @param file Sqlite database file name or path
 #' @param table_name table name for installing of dataset
 #' @param data_dir the dir path to store the db, defaults to working dir
-#' @param debug Setting TRUE helps in debugging in case of errors
-#' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
-#' @param force Setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
+#' @param debug setting TRUE helps in debugging in case of errors
+#' @param use_cache setting FALSE reinstalls scripts even if they are already installed
+#' @param force setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
 #' @param hash_value the hash value of committed dataset when installing from provenance directory
+#'
+#' @return No return value, installs datasets into SQLite database
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install_sqlite(dataset = "iris", file = "sqlite.db")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -514,12 +542,14 @@ install_sqlite <- function(dataset, file = "sqlite.db", table_name = "{db}_{tabl
 #' @param dataset the name of the dataset that you wish to install or path to a committed dataset zip file
 #' @param file file name for database
 #' @param table_name table name for installing of dataset
-#' @param debug Setting TRUE helps in debugging in case of errors
+#' @param debug setting TRUE helps in debugging in case of errors
 #' @param use_cache Setting FALSE reinstalls scripts even if they are already installed
-#' @param force Setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
+#' @param force setting TRUE doesn't prompt for confirmation while installing committed datasets when changes are discovered in environment
 #' @param hash_value the hash value of committed dataset when installing from provenance directory
+#'
+#' @return No return value, installs datasets into MSAccess database
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install_msaccess(dataset = "iris", file = "sqlite.db")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -553,8 +583,10 @@ install_msaccess <- function(dataset, file = "access.mdb", table_name = "[{db} {
 #' Only relevant for csv connection types. Defaults to current working directory
 #' @param log_dir the location where the retriever log should be stored if
 #' the progress is not printed to the console
+#'
+#' @return No return value, main install function
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::install("iris", "csv")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -635,23 +667,12 @@ install <- function(dataset, connection, db_file = NULL, conn_file = NULL,
   }
 }
 
-#' Get dataset citation information and a description
-#' @param dataset name of the dataset
-#' @return returns a string with the citation information
-#' @examples
-#' \donttest{
-#' rdataretriever::get_citation("plant-comp-us")
-#' }
-#' @importFrom reticulate import r_to_py
-#' @export
-get_citation <- function(dataset) {
-  run_cli(paste("retriever citation", dataset), intern = TRUE)
-}
-
 #' Reset the scripts or data(raw_data) directory or both
-#' @param scope All resets both  scripst and data directory
+#' @param scope All resets both scripst and data directory
+#'
+#' @return No return value, resets the scripts and the data directory
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::reset("iris")
 #' }
 #' @importFrom reticulate import r_to_py
@@ -666,12 +687,14 @@ reset <- function(scope = "all") {
 #' This function will check if the version of the retriever's scripts in your local
 #' directory \file{~/.retriever/scripts/} is up-to-date with the most recent official
 #' retriever release. Note it is possible that even more updated scripts exist
-#' at the retriever repository \url{https://github.com/weecology/retriever/tree/master/scripts}
+#' at the retriever repository \url{https://github.com/weecology/retriever/tree/main/scripts}
 #' that have not yet been incorperated into an official release, and you should
 #' consider checking that page if you have any concerns.
 #' @keywords utilities
+#'
+#' @return No return value, updatea the retriever's dataset scripts to the most recent versions
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::get_updates()
 #' }
 #' @importFrom reticulate import r_to_py
@@ -684,8 +707,10 @@ get_updates <- function() {
 
 #' Update the retriever's global_script_list with the scripts present
 #' in the ~/.retriever directory.
+#'
+#' @return No return value, fetches most resent scripts
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::reload_scripts()
 #' }
 #' @importFrom reticulate import r_to_py
@@ -697,14 +722,117 @@ reload_scripts <- function() {
 #' Setting path of retriever
 #'
 #' @param path location of retriever in the system
+#'
+#' @return No return value, setting path of retriever
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' rdataretriever::use_RetrieverPath("/home/<system_name>/anaconda2/envs/py27/bin/")
 #' }
 #' @export
 use_RetrieverPath <- function(path) {
   Sys.setenv(PATH = paste(path, ":", Sys.getenv("PATH"), sep = ""))
 }
+
+#' install the python module `retriever`
+#' 
+#' @inheritParams reticulate::py_install
+#' 
+#' @return No return value, install the python module `retriever`
+#' @export
+install_retriever <- function(method = "auto", conda = "auto") {
+  reticulate::py_install("retriever", method = method, conda = conda)
+}
+
+#' Updates the datasets_url.json from the github repo
+#'
+#' @param test flag set when testing
+#'
+#' @return No return value, updates the datasets_url.json
+#' @examples
+#' \dontrun{
+#' rdataretriever::update_rdataset_catalog()
+#' }
+#' @importFrom reticulate import r_to_py
+#' @export
+update_rdataset_catalog <-function(test=FALSE){
+  retriever$update_rdataset_catalog(test)
+}
+
+#' Displays the list of rdataset names present in the list of packages provided
+#'
+#' Can take a list of packages, or NULL or a string 'all' for all rdataset packages and datasets
+#' @param package_name print datasets in the package, default to print rdataset and all to print all
+#'
+#' @return No return value, displays the list of rdataset names present
+#' @examples
+#' \dontrun{
+#' rdataretriever::display_all_rdataset_names()
+#' }
+#' @importFrom reticulate import r_to_py
+#' @export
+display_all_rdataset_names <- function(package_name=NULL){
+  retriever$display_all_rdataset_names(package_name)
+}
+
+#' Returns a list of all the available RDataset names present
+#'
+#' @return No return value, list of all the available RDataset
+#' @examples
+#' \dontrun{
+#' rdataretriever::get_rdataset_names()
+#' }
+#' @importFrom reticulate import r_to_py
+#' @export
+get_rdataset_names <- function(){
+  retriever$get_rdataset_names()
+}
+
+#' Returns the list of dataset names after autocompletion
+#'
+#' @param dataset the name of the dataset
+#'
+#' @return No return value, show dataset names after autocompletion
+#' @examples
+#' \dontrun{
+#' rdataretriever::socrata_autocomplete_search()
+#' }
+#' @importFrom reticulate import r_to_py
+#' @export
+socrata_autocomplete_search <- function(dataset){
+  retriever$socrata_autocomplete_search(dataset)
+}
+
+#' Get socrata dataset info
+#'
+#' @param dataset_name dataset name to obtain info
+#'
+#' @return No return value, shows socrata dataset info
+#' @examples
+#' \dontrun{
+#' rdataretriever::socrata_dataset_info()
+#' }
+#' @importFrom reticulate import r_to_py
+#' @export
+socrata_dataset_info <- function(dataset_name){
+  retriever$socrata_dataset_info(dataset_name)
+}
+
+#' Returns metadata for the following dataset id
+#'
+#' @param dataset_id id of the dataset
+#'
+#' @return No return value, shows metadata for the following \code{dataset id}
+#' @examples
+#' \dontrun{
+#' rdataretriever::socrata_dataset_info()
+#' }
+#' @importFrom reticulate import r_to_py
+#' @export
+find_socrata_dataset_by_id <- function(dataset_id){
+  retriever$find_socrata_dataset_by_id(dataset_id)
+}
+
+# Package helper functions
 
 print.update_log <- function(x, ...) {
   if (length(x) == 0) {
@@ -721,15 +849,6 @@ print.update_log <- function(x, ...) {
     ))
     object[1] <- paste("Downloaded scripts:", object[1])
     cat(object, fill = TRUE, sep = ", ")
-  }
-}
-
-run_cli <- function(...) {
-  os <- Sys.info()[["sysname"]]
-  if (os == "Windows") {
-    shell(...)
-  } else {
-    system(...)
   }
 }
 
@@ -753,16 +872,6 @@ get_os <- function() {
   tolower(os)
 }
 
-#' install the python module `retriever`
-#' 
-#' @inheritParams reticulate::py_install
-#' 
-#' @export
-install_retriever <- function(method = "auto", conda = "auto") {
-  reticulate::py_install("retriever", method = method, conda = conda)
-}
-
-# global reference to python modules (will be initialized in .onLoad)
 retriever <- NULL
 
 .onLoad <- function(libname, pkgname) {

@@ -7,18 +7,20 @@
 datasets(keywords = "", licenses = "")
 }
 \arguments{
-\item{keywords}{Search all datasets by keywords}
+\item{keywords}{search all datasets by keywords}
 
-\item{licenses}{Search all datasets by licenses}
+\item{licenses}{search all datasets by licenses}
 }
 \value{
 returns a character vector with the available datasets for download
+
+Returns the names of all available dataset scripts
 }
 \description{
 Additional information on the available datasets can be found at url https://retriever.readthedocs.io/en/latest/datasets.html
 }
 \examples{
-\donttest{
+\dontrun{
 rdataretriever::datasets()
 }
 }

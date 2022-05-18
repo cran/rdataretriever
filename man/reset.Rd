@@ -7,13 +7,16 @@
 reset(scope = "all")
 }
 \arguments{
-\item{scope}{All resets both  scripst and data directory}
+\item{scope}{All resets both scripst and data directory}
+}
+\value{
+No return value, resets the scripts and the data directory
 }
 \description{
 Reset the scripts or data(raw_data) directory or both
 }
 \examples{
-\donttest{
+\dontrun{
 rdataretriever::reset("iris")
 }
 }

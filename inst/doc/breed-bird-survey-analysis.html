@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Using the rdataretriever to quickly analyze Breeding Bird Survey data</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using the rdataretriever to quickly analyze Breeding Bird Survey data</h1>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The Breeding Bird Survey of North America (BBS) is a widely used dataset for understanding geospatial variation and dynamic changes in bird communities. The dataset is a continental scale community science project where thousands of birders count birds at locations across North America. It has been used in hundreds of research projects including research on biodiversity gradients <span class="citation">(Hurlbert and Haskell 2003)</span>, ecological forecasting <span class="citation">(Harris, Taylor, and White 2018)</span>, and bird declines <span class="citation">(Rosenberg et al. 2019)</span>.</p>
+<p>However working with the Breeding Bird Survey data can be challenging because it is composed of roughly 100 different files that need to be cleaned and then combined in multiple ways. These initial phases of the data analysis pipeline can require hours of work for even experienced users to understand the detailed layout of the data and either manually assemble it or write code to combine the data. The data structure and location also changes regularly meaning that code for this work that is not regularly tested quickly stops working.</p>
+<p>This vignette demonstrates how using the <code>rdataretriever</code> can eliminate hours of work on data cleaning and restructing allowing researchers to quickly begin addressing interesting scientific questions. To do this is demonstrates analyzing the BBS data to evaluate correlates of biodiversity (in the form of species richness).</p>
+</div>
+<div id="load-r-packages" class="section level2">
+<h2>Load R Packages</h2>
+<p>We start by loading the necessary packages. In addition to the <code>rdataretriever</code> in this demo we’ll also use <code>DBI</code>, <code>RSQLite</code> and <code>dplyr</code> to work with the data, <code>raster</code> for working with environmental data, and <code>ggplot2</code> for visualization.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(rdataretriever)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(DBI)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">library</span>(dbplyr)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="kw">library</span>(raster)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="kw">library</span>(ggplot2)</span></code></pre></div>
+</div>
+<div id="install-and-connect-to-the-breeding-bird-survey-data" class="section level2">
+<h2>Install And Connect To The Breeding Bird Survey Data</h2>
+<p>First we’ll update the <code>rdataretriever</code> to make sure we have the newest data processing recipes in case something about the structure or location of the dataset has changed. Centrally updated data recipes reproducible research with this dataset because something changes every year when the newest data is released meaning that any custom code for processing the data stops working. When this happens the <code>retriever</code> recipe is updated and after running <code>get_updates()</code> data analysis code continues to run as it always has.</p>
+<p>Next install the BBS data into an SQLite database named <code>bbs.sqlite</code>.</p>
+<p>We could also load the data straight into R (using <code>rdataretriever::fetch(&#39;breed-bird-survey&#39;)</code>), store it as flat files (CSV, JSON, or XML), or load it into other database management systems (PostgreSQL, MariaDB, MySQL). The data is moderately large (~1GB) so SQLite represents a nice compromise between efficiently conducting the first steps in the data manipulation pipeline while requiring no additional setup or expertise. The large number of storage backends makes the <code>rdataretriever</code> easy to integrate into existing data processing workflows and to implement designs appropriate to the scale of the data with no additional work.</p>
+<p>Having installed the data into SQLite we can then connect to the database to start analyzing the data.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>bbs_db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), <span class="st">&#39;bbs.sqlite&#39;</span>)</span></code></pre></div>
+<p>The two key tables for this analysis are the <code>surveys</code> and <code>sites</code> tables, so let’s create connections to those tables.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>surveys &lt;-<span class="st"> </span><span class="kw">tbl</span>(bbs_db, <span class="st">&quot;breed_bird_survey_counts&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>sites &lt;-<span class="st"> </span><span class="kw">tbl</span>(bbs_db, <span class="st">&quot;breed_bird_survey_routes&quot;</span>)</span></code></pre></div>
+<p>The <code>surveys</code> table holds the data on how many individuals of each species are sampled at each site. The <code>sites</code> table holds information on where each site is which we’ll use to link the data to environmental variables.</p>
+</div>
+<div id="analyze-the-data" class="section level2">
+<h2>Analyze The Data</h2>
+<p>To calculate the measure of biodiversity, which is species richness or the number of species, we’ll use <code>dplyr</code> to determine the number of species observed at each site in a recent year.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>rich_data &lt;-<span class="st"> </span>surveys <span class="op">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="st">  </span><span class="kw">filter</span>(year <span class="op">==</span><span class="st"> </span><span class="dv">2016</span>) <span class="op">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="st">  </span><span class="kw">group_by</span>(statenum, route) <span class="op">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">richness =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="st">  </span><span class="kw">collect</span>()</span>
+<span id="cb4-6"><a href="#cb4-6"></a>rich_data</span></code></pre></div>
+<p>The data is now smaller than the original ~1 GB, so we used <code>collect</code> to load the summarized data directly into R.</p>
+<p>Next we need to get environmental data for each site, which we’ll get from the <code>worldclim</code> dataset.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>bioclim &lt;-<span class="st"> </span><span class="kw">getData</span>(<span class="st">&#39;worldclim&#39;</span>, <span class="dt">var =</span> <span class="st">&#39;bio&#39;</span>, <span class="dt">res =</span> <span class="dv">10</span>)</span></code></pre></div>
+<p>To extract the environmental data we first make our sites data spatial and add them to our map.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>sites &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(sites)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>sites_spatial &lt;-<span class="st"> </span><span class="kw">SpatialPointsDataFrame</span>(sites[<span class="kw">c</span>(<span class="st">&#39;longitude&#39;</span>, <span class="st">&#39;latitude&#39;</span>)], sites)</span></code></pre></div>
+<p>We can then extract the environmental data for each site from the bioclim raster and add it to the data on biodiversity.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>bioclim_bbs &lt;-<span class="st"> </span><span class="kw">extract</span>(bioclim, sites_spatial) <span class="op">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="st">  </span><span class="kw">cbind</span>(sites)</span>
+<span id="cb7-3"><a href="#cb7-3"></a>richness_w_env &lt;-<span class="st"> </span><span class="kw">inner_join</span>(rich_data, bioclim_bbs)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>richness_w_env</span></code></pre></div>
+<p>Now let’s see how richness relates to the precipitation. Annual precipition is stored in <code>bio12</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">ggplot</span>(richness_w_env, <span class="kw">aes</span>(<span class="dt">x =</span> bio12, <span class="dt">y =</span> richness)) <span class="op">+</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Annual Precipitation&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Number of Species&quot;</span>)</span></code></pre></div>
+<p>It looks like there’s a pattern here, so let’s fit a smoother through it.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">ggplot</span>(richness_w_env, <span class="kw">aes</span>(<span class="dt">x =</span> bio12, <span class="dt">y =</span> richness)) <span class="op">+</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="st">  </span><span class="kw">geom_smooth</span>()</span></code></pre></div>
+<p>This shows that there is low bird biodiversity in really dry areas, biodiversity peaks at intermediate precipitations, and then drops off at the highest precipitation values.</p>
+<p>If we wanted to use this kind of information to inform conservation decisions at the state level, could look at the patterns within each state after filtering to ensure enough data points.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>richness_w_env_high_n &lt;-<span class="st"> </span>richness_w_env <span class="op">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="st">  </span><span class="kw">group_by</span>(statenum) <span class="op">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="st">  </span><span class="kw">filter</span>(<span class="kw">n</span>() <span class="op">&gt;=</span><span class="st"> </span><span class="dv">50</span>)</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="kw">ggplot</span>(richness_w_env_high_n, <span class="kw">aes</span>(<span class="dt">x =</span> bio12, <span class="dt">y =</span> richness)) <span class="op">+</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="st">  </span><span class="kw">geom_smooth</span>() <span class="op">+</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>statenum, <span class="dt">scales =</span> <span class="st">&#39;free&#39;</span>) <span class="op">+</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Annual Precipitation&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Number of Species&quot;</span>)</span></code></pre></div>
+<p>Looking back at this demo there is only one line of code directly involving the <code>rdataretriever</code> (other than installation). This demonstrates the strength that the <code>rdataretriever</code> brings to the the early phases of the data acquistion and processing pipeline by distilling those steps to a single line that provides the data in a ready-to-analyze form so that researchers can focus on the analysis of the data itself.</p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Thanks to the <code>rdataretriever</code> we can generate meaningful information about large scale bird biodiversity patterns in about 15 minutes. If we’d been working with the raw BBS data we would likely have spent hours manipulating and cleaning data before we could start this analysis.</p>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
+<div id="refs" class="references">
+<div id="ref-harris2018">
+<p>Harris, David J, Shawn D Taylor, and Ethan P White. 2018. “Forecasting Biodiversity in Breeding Birds Using Best Practices.” <em>PeerJ</em> 6: e4278.</p>
+</div>
+<div id="ref-hurlbert2003">
+<p>Hurlbert, Allen H, and John P Haskell. 2003. “The Effect of Energy and Seasonality on Avian Species Richness and Community Composition.” <em>The American Naturalist</em> 161 (1): 83–97.</p>
+</div>
+<div id="ref-rosenberg2019">
+<p>Rosenberg, Kenneth V, Adriaan M Dokter, Peter J Blancher, John R Sauer, Adam C Smith, Paul A Smith, Jessica C Stanton, et al. 2019. “Decline of the North American Avifauna.” <em>Science</em> 366 (6461): 120–24.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

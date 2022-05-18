@@ -12,8 +12,12 @@ method that will work in the local environment. Change the default to force
 a specific installation method. Note that the "virtualenv" method is not
 available on Windows.}
 
-\item{conda}{The path to a \code{conda} executable. Use \code{"auto"} to allow \code{reticulate} to
-automatically find an appropriate \code{conda} binary. See \strong{Finding Conda} for more details.}
+\item{conda}{The path to a \code{conda} executable. Use \code{"auto"} to allow
+\code{reticulate} to automatically find an appropriate \code{conda} binary. See
+\strong{Finding Conda} for more details.}
+}
+\value{
+No return value, install the python module `retriever`
 }
 \description{
 install the python module `retriever`

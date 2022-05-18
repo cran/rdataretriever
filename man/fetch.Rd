@@ -15,12 +15,15 @@ fetch(dataset, quiet = TRUE, data_names = NULL)
 stores the fetched dataframes. This is only relevant if you are
 downloading more than one dataset.}
 }
+\value{
+Returns a dataframe of \code{dataset}
+}
 \description{
 Each datafile in a given dataset is downloaded to a temporary directory and
 then imported as a data.frame as a member of a named list.
 }
 \examples{
-\donttest{
+\dontrun{
 ## fetch the portal Database
 portal <- rdataretriever::fetch("portal")
 class(portal)

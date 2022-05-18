@@ -22,16 +22,19 @@ download(
 
 \item{sub_dir}{downloaded dataset is stored into a custom subdirectory.}
 
-\item{debug}{Setting TRUE helps in debugging in case of errors}
+\item{debug}{setting TRUE helps in debugging in case of errors}
 
 \item{use_cache}{Setting FALSE reinstalls scripts even if they are already installed}
+}
+\value{
+No return value, downloads the raw dataset
 }
 \description{
 Directly downloads data files with no processing, allowing downloading of
 non-tabular data.
 }
 \examples{
-\donttest{
+\dontrun{
 rdataretriever::download("plant-comp-ok")
 # downloaded files will be copied to your working directory
 # when no path is specified

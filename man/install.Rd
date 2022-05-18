@@ -39,12 +39,15 @@ Only relevant for csv connection types. Defaults to current working directory}
 \item{log_dir}{the location where the retriever log should be stored if
 the progress is not printed to the console}
 }
+\value{
+No return value, main install function
+}
 \description{
 Data is stored in either CSV files or one of the following database management
 systems: MySQL, PostgreSQL, SQLite, or Microsoft Access.
 }
 \examples{
-\donttest{
+\dontrun{
 rdataretriever::install("iris", "csv")
 }
 }

@@ -1,23 +1,30 @@
 # rdataretriever
 
 <!-- badges: start -->
-[![Build Status](https://travis-ci.org/ropensci/rdataretriever.svg?branch=master)](https://travis-ci.org/ropensci/rdataretriever)
+[![Build Status](https://travis-ci.org/ropensci/rdataretriever.svg?branch=main)](https://travis-ci.org/ropensci/rdataretriever)
 [![Build status](https://ci.appveyor.com/api/projects/status/de1badmnrt6goamh?svg=true)](https://ci.appveyor.com/project/ethanwhite/rdataretriever)[![cran version](https://www.r-pkg.org/badges/version/rdataretriever)](https://CRAN.R-project.org/package=rdataretriever)
 [![Documentation Status](https://readthedocs.org/projects/retriever/badge/?version=latest)](https://retriever.readthedocs.io/en/latest/rdataretriever.html#)
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/rdataretriever)](https://CRAN.R-project.org/package=rdataretriever) +
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/ecoretriever)](https://CRAN.R-project.org/package=ecoretriever)
 (old package name)
+[![DOI](https://zenodo.org/badge/18155090.svg)](https://zenodo.org/badge/latestdoi/18155090)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.02800/status.svg)](https://doi.org/10.21105/joss.02800)
+
 <!-- badges: end -->
 
 R interface to the [Data Retriever](https://retriever.readthedocs.io/en/latest/).
 
-The Data Retriever automates the tasks of finding, downloading, and cleaning up
-publicly available data, and loads them or stores them in variety of databases
-or flat file formats. This lets data analysts spend less time cleaning up and
-managing data, and more time analyzing it.
+The `rdataretriever` provides access to cleaned versions of hundreds of commonly used public datasets with a single line of code. 
 
-This package lets you work with the Data Retriever (written in Python) using R,
-so that the Retriever's data handling can easily be integrated into R workflows.
+These datasets come from many different sources and most of them require some cleaning and restructuring prior to analysis.
+The `rdataretriever` uses a set of actively maintained recipes for downloading, cleaning, and restructing these datasets using a combination of the [Frictionless Data Specification](https://specs.frictionlessdata.io/) and custom data cleaning scripts. 
+
+The `rdataretriever` also facilitates the automatic storage of these datasets in a choice of database management systems (PostgreSQL, SQLite, MySQL, MariaDB) or flat file formats (CSV, XML, JSON) for later use and integration with large data analysis pipelines.
+
+The `rdatretriever` also facilitates reproducibile science by providing tools to archive and rerun the precise version of a dataset and associated cleaning steps that was used for a specific analysis.
+
+The `rdataretriever` handles the work of cleaning, storing, and archiving data so that you can focus on analysis, inference and visualization.
+
 
 ## Table of Contents
 
@@ -121,7 +128,7 @@ install.packages("rdataretriever") # latest release from CRAN
 ```
 
 ```coffee
-devtools::install_github("ropensci/rdataretriever") # development version from GitHub
+remotes::install_github("ropensci/rdataretriever") # development version from GitHub
 ```
 
 ## Installing Tabular Datasets
@@ -211,30 +218,45 @@ rdataretriever::install_postgres('usgs-elevation', list(-94.98704597353938, 39.0
 
 ## Provenance
 
-`rdataretriever` allows users to save a dataset in its current state which can be used later.
+To ensure reproducibility the `rdataretriever` supports creating snapshots of the data and the script in time.
 
-Note: You can save your datasets in provenance directory by setting the environment variable `PROVENANCE_DIR`
+Use the commit function to create and store the snapshot image of the data in time. Provide a descriptive message for the created commit. This is comparable to a git commit, however the function bundles the data and scripts used as a backup.
+
+With provenace, you will be able to reproduce the same analysis in the future.
 
 **Commit a dataset**
+
+By default commits will be stored in the provenance directory `.retriever_provenance`, but this directory can be changed by setting the environment variable `PROVENANCE_DIR`.
+
 ```coffee
-rdataretriever::commit('abalone-age', commit_message='Sample commit', path='/home/user/')
+rdataretriever::commit('abalone-age',
+                       commit_message='A snapshot of Abalone Dataset as of 2020-02-26')
 ```
-To commit directly to provenance directory:
+
+You can also set the path for an individual commit:
+
 ```coffee
-rdataretriever::commit('abalone-age', commit_message='Sample commit')
+rdataretriever::commit('abalone-age',
+                       commit_message='Data and recipe archive for Abalone Data on 2020-02-26',
+					   path='.')
 ```
-**Log of committed dataset in provenance directory**
+
+**View a log of committed datasets in the provenance directory**
+
 ```coffee
 rdataretriever::commit_log('abalone-age')
 ```
 
 **Install a committed dataset**
+
+To reanalyze a committed dataset, rdataretriever will obtain the data and script from the history and rdataretriever will install this particular data into the given back-end. For example, SQLite:
+
 ```coffee
 rdataretriever::install_sqlite('abalone-age-a76e77.zip') 
 ```
 Datasets stored in provenance directory can be installed directly using hash value
 ```coffee
-rdataretriever::install_sqlite('abalone-age', hash_value='a76e77`)
+rdataretriever::install_sqlite('abalone-age', hash_value='a76e77')
 ``` 
 
 ## Using Docker Containers

@@ -9,11 +9,14 @@ use_RetrieverPath(path)
 \arguments{
 \item{path}{location of retriever in the system}
 }
+\value{
+No return value, setting path of retriever
+}
 \description{
 Setting path of retriever
 }
 \examples{
-\donttest{
+\dontrun{
 rdataretriever::use_RetrieverPath("/home/<system_name>/anaconda2/envs/py27/bin/")
 }
 }
