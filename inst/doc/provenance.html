@@ -14,106 +14,103 @@
 
 <title>Provenance &amp; Reproducibility Using the rdataretriever</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
 });
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -122,13 +119,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -139,6 +143,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 <style type="text/css">body {
 background-color: #fff;
@@ -332,22 +358,51 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Provenance &amp; Reproducibility Using the rdataretriever</h1>
+<h1 class="title toc-ignore">Provenance &amp; Reproducibility Using the
+rdataretriever</h1>
 
 
 
-<p>Datasets that are regularly updated are increasingly common <span class="citation">(Yenni et al. 2019)</span>. This presents two challenges for reprodubility. First, if the underlying structure of the dataset changes then previously written code for processing the data will often cease to run properly. Second, if the version of the data used in a particularly analysis isn’t archived then if the data changes it will be difficult to reproduce the original analysis.</p>
-<p>The <code>retriever</code> and <code>rdataretriever</code> address both of these limitations. The centrally maintained scripts for processing datasets are updated when datasets change structure and so as long as <code>rdataretriever::get_updates()</code> is run before installing the dataset all data code for downloading, cleaning, and installing the data will continue to work. While the regularly updated data processing recipes ensure that code analyzing the datasets will always continue to run, it is important for reproducibility that we be able to rerun the exact data processing steps on the exact data that was used for the original analysis. The <code>rdataretriever</code> has built in provenance functionality to support this.</p>
-<p>To store the data and processing script in their current state we use the <code>commit()</code> function to store both components of the data processing in a zip file for future reuse. This is logically similar to a git commit in that we store the state of the data and the process at a moment in time using a hash.</p>
-<p>For example, the <code>portal-dev</code> dataset is updated weekly. If we want to be able rerun our original analysis after the reviews for a paper come back we’ll need to store that version of the data.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>rdataretriever<span class="op">::</span><span class="kw">commit</span>(<span class="st">&#39;portal-dev&#39;</span>, <span class="dt">commit_message=</span><span class="st">&#39;Archive Portal data processing for initial submission on 2020-02-26&#39;</span>, <span class="dt">path =</span> <span class="st">&#39;.&#39;</span>)</span></code></pre></div>
-<p>When we want to reanalyze this exact state of the dataset we can load it back into SQLite (or any of the other backends). Use the hash number related to the commit.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>rdataretriever<span class="op">::</span><span class="kw">install_sqlite</span>(<span class="st">&quot;portal-dev-326d87.zip&quot;</span>)</span></code></pre></div>
+<p>Datasets that are regularly updated are increasingly common <span class="citation">(Yenni et al. 2019)</span>. This presents two
+challenges for reprodubility. First, if the underlying structure of the
+dataset changes then previously written code for processing the data
+will often cease to run properly. Second, if the version of the data
+used in a particularly analysis isn’t archived then if the data changes
+it will be difficult to reproduce the original analysis.</p>
+<p>The <code>retriever</code> and <code>rdataretriever</code> address
+both of these limitations. The centrally maintained scripts for
+processing datasets are updated when datasets change structure and so as
+long as <code>rdataretriever::get_updates()</code> is run before
+installing the dataset all data code for downloading, cleaning, and
+installing the data will continue to work. While the regularly updated
+data processing recipes ensure that code analyzing the datasets will
+always continue to run, it is important for reproducibility that we be
+able to rerun the exact data processing steps on the exact data that was
+used for the original analysis. The <code>rdataretriever</code> has
+built in provenance functionality to support this.</p>
+<p>To store the data and processing script in their current state we use
+the <code>commit()</code> function to store both components of the data
+processing in a zip file for future reuse. This is logically similar to
+a git commit in that we store the state of the data and the process at a
+moment in time using a hash.</p>
+<p>For example, the <code>portal-dev</code> dataset is updated weekly.
+If we want to be able rerun our original analysis after the reviews for
+a paper come back we’ll need to store that version of the data.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>rdataretriever<span class="sc">::</span><span class="fu">commit</span>(<span class="st">&#39;portal-dev&#39;</span>, <span class="at">commit_message=</span><span class="st">&#39;Archive Portal data processing for initial submission on 2020-02-26&#39;</span>, <span class="at">path =</span> <span class="st">&#39;.&#39;</span>)</span></code></pre></div>
+<p>provenance.R</p>
+<p>When we want to reanalyze this exact state of the dataset we can load
+it back into SQLite (or any of the other backends). Use the hash number
+related to the commit.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>rdataretriever<span class="sc">::</span><span class="fu">install_sqlite</span>(<span class="st">&quot;portal-dev-326d87.zip&quot;</span>)</span></code></pre></div>
+<p>provenance.R</p>
 <div id="references" class="section level2 unnumbered">
-<h2>References</h2>
-<div id="refs" class="references">
-<div id="ref-yenni2019">
-<p>Yenni, Glenda M, Erica M Christensen, Ellen K Bledsoe, Sarah R Supp, Renata M Diaz, Ethan P White, and SK Morgan Ernest. 2019. “Developing a Modern Data Workflow for Regularly Updated Data.” <em>PLoS Biology</em> 17 (1): e3000125.</p>
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-yenni2019" class="csl-entry">
+Yenni, Glenda M, Erica M Christensen, Ellen K Bledsoe, Sarah R Supp,
+Renata M Diaz, Ethan P White, and SK Morgan Ernest. 2019.
+<span>“Developing a Modern Data Workflow for Regularly Updated
+Data.”</span> <em>PLoS Biology</em> 17 (1): e3000125.
 </div>
 </div>
 </div>
